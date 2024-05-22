@@ -1,6 +1,7 @@
 #!/bin/bash
 
 OUTFILE="$HOME/.local/share/signal-cli/cutemafia/cutemafia_out.json"
+#CM_DIR="$(basename "$OUTFILE")" #CUTEMAFIA DIR
 
 check_sender()
 {
@@ -17,6 +18,12 @@ check_sender()
 }
 
 tail -f "$OUTFILE" | while IFS='' read line; do
+	# Get sender message.. 
+	sender_msg="$(echo "$line" | jq -r '.envelope.dataMessage?.message')"
+	# check if sender msg is 1..10 and coming from cm user
+	echo "$sender_msg" | grep -qE '(10|[0-9])' && check_sender
+	[ -n "$cm_user" ] && echo "cm_user: $cm_user"
+
     image="$(echo "$line" | jq '.envelope.dataMessage?.attachments[]? | [select(.contentType | startswith("image")).id]' | awk 'NR==2' | tr -d ' "')"
 	
 	# Run the following if an image is sent as part of the sent message
@@ -40,13 +47,15 @@ tail -f "$OUTFILE" | while IFS='' read line; do
 			convert-img.sh -i "$input" -r -o "$output_img"
 
 			# Send output_img as attachment to $sender
-			signal-cli --dbus send "$sender" -a "$output_img"
+			#signal-cli --dbus send "$sender" -a "$output_img"
 			signal-cli --dbus send "$sender" -m "[$i]"
 		done
 
 		# if CM user ask if they want to upload to website
-		#[ -n "$cm_user" ] && signal-cli --dbus send "$sender" -m "Upload to website [1-10]?"
+		[ -n "$cm_user" ] && signal-cli --dbus send "$sender" -m "Upload to website [1-10]?"
+		#sender_msg="$(echo "$line" | jq '.envelope.dataMessage?.attachments[]? | [select(.contentType | startswith("image")).id]' | awk 'NR==2' | tr -d ' "')"
 
 		rm -r "$tmp_dir"	
 	fi
 done
+
