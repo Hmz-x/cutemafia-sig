@@ -5,12 +5,10 @@ OUTFILE="$HOME/.local/share/signal-cli/cutemafia/cutemafia_out.json"
 check_sender()
 {
 	sender="$(echo "$line" | jq -r '.envelope.sourceUuid')"
+  echo "sender: $sender"
 	cm_user=""
 
-	if [ "$sender" = "ab847469-a4a3-4f29-ae6a-33c83ea17f3c" ]; then
-		cm_user="beyza"
-		cm_msg="FB❤️ FB😍 FB💞 ,,..still do these things for u \`.✧.~\`~.✧.\` got something u feel tho 💦💦💦🥵🥵"
-	elif [ "$sender" = "5e590c88-d627-4418-b43f-d770f7e23653" ]; then
+	if [ "$sender" = "d878ec8b-5eab-44a9-ac1d-96c3d28e9224" ]; then
 		cm_user="kerem"
 		cm_msg="ASLANIM \`.✧.~\`~.✧.\`"
 	fi
